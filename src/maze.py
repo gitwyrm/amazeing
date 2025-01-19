@@ -98,3 +98,48 @@ class Maze():
         for i in range(self._num_cols):
             for j in range(self._num_rows):
                 self._cells[i][j].visited = False
+
+    def solve(self):
+        """
+        Solve the maze using a depth-first search algorithm
+        """
+        return self._solve_r(0, 0)
+
+    def _solve_r(self, i, j):
+        """
+        Recursive function to solve the maze
+        """
+        self._cells[i][j].visited = True
+        self._draw_cell(i, j)
+        if i == self._num_cols - 1 and j == self._num_rows - 1:
+            return True
+        directions = [(0, -1), (1, 0), (0, 1), (-1, 0)]
+        random.shuffle(directions)
+        for dx, dy in directions:
+            new_i = i + dx
+            new_j = j + dy
+            if new_i < 0 or new_i >= self._num_cols or new_j < 0 or new_j >= self._num_rows:
+                continue
+            if self._cells[new_i][new_j].visited:
+                continue
+            if dx == 1 and not self._cells[i][j].has_right_wall:
+                if self._solve_r(new_i, new_j):
+                    self._cells[i][j].draw_move(self._cells[new_i][new_j])
+                    self._animate()
+                    return True
+            elif dx == -1 and not self._cells[i][j].has_left_wall:
+                if self._solve_r(new_i, new_j):
+                    self._cells[i][j].draw_move(self._cells[new_i][new_j])
+                    self._animate()
+                    return True
+            elif dy == 1 and not self._cells[i][j].has_bottom_wall:
+                if self._solve_r(new_i, new_j):
+                    self._cells[i][j].draw_move(self._cells[new_i][new_j])
+                    self._animate()
+                    return True
+            elif dy == -1 and not self._cells[i][j].has_top_wall:
+                if self._solve_r(new_i, new_j):
+                    self._cells[i][j].draw_move(self._cells[new_i][new_j])
+                    self._animate()
+                    return True
+        return False
