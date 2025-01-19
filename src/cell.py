@@ -48,11 +48,11 @@ class Cell():
         """
         Draw a move between two cells, a line should go from the center of one cell to the center of the other
         
-        If undo is True, the line is drawn gray, otherwise red
+        If undo is True, the line is drawn red, otherwise green
         """
         if self._win is None:
             return
-        color = "gray" if undo else "red"
+        color = "red" if undo else "green"
         cell_size_x = self._x2 - self._x1
         cell_size_y = self._y2 - self._y1
         self._win.draw_line(Line(Point(self._x1 + cell_size_x/2, self._y1 + cell_size_y/2), Point(to_cell._x1 + cell_size_x/2, to_cell._y1 + cell_size_y/2)), color)
