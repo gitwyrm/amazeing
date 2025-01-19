@@ -1,3 +1,4 @@
+import random
 import time
 from cell import Cell
 
@@ -12,6 +13,7 @@ class Maze():
         cell_size_x,
         cell_size_y,
         win=None,
+        seed = None,
     ):
         self._x1 = x1
         self._y1 = y1
@@ -21,8 +23,11 @@ class Maze():
         self._cell_size_y = cell_size_y
         self._win = win
         self._cells = []
+        if seed is not None:
+            random.seed(seed)
         self._create_cells()
         self._break_entrance_and_exit()
+        self._break_walls_r(0, 0)
 
     def _create_cells(self):
         for i in range(self._num_cols):
@@ -48,10 +53,42 @@ class Maze():
         if self._win is None:
             return
         self._win.redraw()
-        time.sleep(0.05)
+        time.sleep(0.01)
 
     def _break_entrance_and_exit(self):
         self._cells[0][0].has_top_wall = False
         self._draw_cell(0, 0)
         self._cells[self._num_cols - 1][self._num_rows - 1].has_bottom_wall = False
         self._draw_cell(self._num_cols - 1, self._num_rows - 1)
+
+    def _break_walls_r(self, i, j):
+        """
+        Recursive function to break walls between cells
+        """
+        self._cells[i][j].visited = True
+        self._draw_cell(i, j)
+        directions = [(0, -1), (1, 0), (0, 1), (-1, 0)]
+        random.shuffle(directions)
+        for dx, dy in directions:
+            new_i = i + dx
+            new_j = j + dy
+            if new_i < 0 or new_i >= self._num_cols or new_j < 0 or new_j >= self._num_rows:
+                continue
+            if self._cells[new_i][new_j].visited:
+                continue
+            if dx == 1:
+                self._cells[i][j].has_right_wall = False
+                self._cells[new_i][new_j].has_left_wall = False
+            elif dx == -1:
+                self._cells[i][j].has_left_wall = False
+                self._cells[new_i][new_j].has_right_wall = False
+            elif dy == 1:
+                self._cells[i][j].has_bottom_wall = False
+                self._cells[new_i][new_j].has_top_wall = False
+            elif dy == -1:
+                self._cells[i][j].has_top_wall = False
+                self._cells[new_i][new_j].has_bottom_wall = False
+            self._draw_cell(i, j)
+            self._draw_cell(new_i, new_j)
+            self._animate()
+            self._break_walls_r(new_i, new_j)
